@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Super SaaS</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .flash-card {
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    .flash-card.flipped {
+      transform: rotateY(180deg);
+    }
+    .flash-card-front, .flash-card-back {
+      backface-visibility: hidden;
+    }
+    .flash-card-back {
+      transform: rotateY(180deg);
+    }
+    .pinterest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .pinterest-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      transition: transform 0.3s;
+    }
+    .pinterest-item:hover {
+      transform: scale(1.05);
+    }
+    .pinterest-item img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+    .weather-card {
+      background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+      color: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+    .spotify-playlist {
+      background: #1DB954;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p class="mt-4 text-gray-700" id="loading-message">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Welcome Flash Card -->
+  <div id="welcome-card" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+      <div class="flash-card relative w-full h-64 cursor-pointer" onclick="flipCard()">
+        <div class="flash-card-front absolute w-full h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 flex flex-col items-center justify-center text-white">
+          <h2 class="text-2xl font-bold mb-4">Welcome to the Squad! 🎉</h2>
+          <p class="text-center">Thanks for joining our vibe! You're officially part of the fam now.</p>
+        </div>
+        <div class="flash-card-back absolute w-full h-full bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-6 flex flex-col items-center justify-center text-white">
+          <h2 class="text-2xl font-bold mb-4">Gen Z Slang Guide 📱</h2>
+          <ul class="space-y-2 text-sm">
+            <li>✨ <span class="font-bold">No Cap</span> - For real, no lies</li>
+            <li>🔥 <span class="font-bold">Slay</span> - Doing something really well</li>
+            <li>💯 <span class="font-bold">Based</span> - Cool, awesome</li>
+            <li>👀 <span class="font-bold">Sus</span> - Suspicious</li>
+            <li>😤 <span class="font-bold">Flex</span> - Show off</li>
+          </ul>
+        </div>
+      </div>
+      <button onclick="closeWelcomeCard()" class="mt-6 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Let's Go! 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div id="error-toast" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300">
+    <p id="error-message"></p>
+  </div>
+
+  <!-- Success Toast -->
+  <div id="success-toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300">
+    <p id="success-message"></p>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <span class="spon text-2xl font-bold text-blue-700">stingify</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="user-name" class="text-gray-700"></span>
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        Logout
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Profile Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-4">Profile</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Name</label>
+            <p id="profile-name" class="mt-1 text-gray-900"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <p id="profile-email" class="mt-1 text-gray-900"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Account Created</label>
+            <p id="account-age" class="mt-1 text-gray-900"></p>
+          </div>
+          <button onclick="showEditProfile()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Edit Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Weather and Spotify Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="weather-card mb-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-xl font-bold" id="weather-location">Loading location...</h3>
+              <p class="text-4xl font-bold mt-2" id="weather-temp">--°C</p>
+              <p class="text-lg" id="weather-desc">Loading weather...</p>
+            </div>
+            <div class="text-6xl" id="weather-icon">🌤️</div>
+          </div>
+        </div>
+        
+        <!-- Top Tracks Section -->
+        <div class="bg-gray-800 rounded-lg p-4 mb-4">
+          <h3 class="text-xl font-bold text-white mb-3">Your Top Tracks</h3>
+          <div id="top-tracks" class="space-y-3">
+            <!-- Top tracks will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Weather-Based Playlist -->
+        <div class="spotify-playlist">
+          <h3 class="text-xl font-bold text-white mb-2">Weather-Based Playlist</h3>
+          <div id="playlist-info" class="mb-3">
+            <h4 id="playlist-name" class="text-lg font-semibold text-white"></h4>
+            <p id="playlist-desc" class="text-sm text-white opacity-80"></p>
+          </div>
+          <div id="spotify-embed" class="w-full">
+            <iframe id="spotify-frame" 
+                    src="about:blank"
+                    width="100%" 
+                    height="152" 
+                    frameborder="0" 
+                    allowtransparency="true" 
+                    allow="encrypted-media">
+            </iframe>
+          </div>
+          <div id="playlist-tracks" class="mt-3 space-y-2">
+            <!-- Playlist tracks will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pinterest Gallery Section -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-bold mb-4">Inspiration Gallery</h2>
+      <div class="pinterest-grid" id="pinterest-gallery">
+        <!-- Pinterest images will be loaded here -->
+      </div>
+      <button onclick="loadMorePinterestImages()" class="mt-4 w-full bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700">
+        Load More Inspiration
+      </button>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <h3 class="text-xl font-bold mb-4">Edit Profile</h3>
+      <form id="edit-profile-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name</label>
+          <input type="text" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" onclick="hideEditProfile()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Utility functions
+    function showLoading(message = 'Loading...') {
+      document.getElementById('loading-message').textContent = message;
+      document.getElementById('loading-overlay').classList.remove('hidden');
+      document.getElementById('loading-overlay').classList.add('flex');
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').classList.add('hidden');
+      document.getElementById('loading-overlay').classList.remove('flex');
+    }
+
+    function showError(message) {
+      const toast = document.getElementById('error-toast');
+      document.getElementById('error-message').textContent = message;
+      toast.classList.remove('translate-x-full');
+      setTimeout(() => {
+        toast.classList.add('translate-x-full');
+      }, 3000);
+    }
+
+    function showSuccess(message) {
+      const toast = document.getElementById('success-toast');
+      document.getElementById('success-message').textContent = message;
+      toast.classList.remove('translate-x-full');
+      setTimeout(() => {
+        toast.classList.add('translate-x-full');
+      }, 3000);
+    }
+
+    // Flash card functions
+    function flipCard() {
+      const card = document.querySelector('.flash-card');
+      card.classList.toggle('flipped');
+    }
+
+    function closeWelcomeCard() {
+      document.getElementById('welcome-card').classList.add('hidden');
+      document.getElementById('welcome-card').classList.remove('flex');
+    }
+
+    // Token verification and user data loading
+    async function verifyToken() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        showLoading('Verifying session...');
+        const res = await fetch('/api/verify-token', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+        if (!data.valid) {
+          throw new Error('Invalid token');
+        }
+
+        await loadUserData();
+        await initializeFeatures();
+        showWelcomeCard();
+      } catch (error) {
+        console.error('Token verification error:', error);
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function showWelcomeCard() {
+      const welcomeCard = document.getElementById('welcome-card');
+      welcomeCard.classList.remove('hidden');
+      welcomeCard.classList.add('flex');
+    }
+
+    async function loadUserData() {
+      try {
+        showLoading('Loading user data...');
+        const res = await fetch('/api/user/profile', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to load user data');
+        }
+
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to load user data');
+        }
+
+        document.getElementById('profile-name').textContent = data.user.name;
+        document.getElementById('profile-email').textContent = data.user.email;
+        document.getElementById('account-age').textContent = calculateAccountAge(data.user.createdAt);
+        document.getElementById('last-login').textContent = new Date(data.user.lastLogin).toLocaleDateString();
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function calculateAccountAge(createdAt) {
+      const created = new Date(createdAt);
+      const now = new Date();
+      const diffTime = Math.abs(now - created);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return `${diffDays} days ago`;
+    }
+
+    function showEditProfile() {
+      document.getElementById('edit-profile-modal').classList.remove('hidden');
+      document.getElementById('edit-profile-modal').classList.add('flex');
+    }
+
+    function hideEditProfile() {
+      document.getElementById('edit-profile-modal').classList.add('hidden');
+      document.getElementById('edit-profile-modal').classList.remove('flex');
+    }
+
+    function changePassword() {
+      window.location.href = 'reset-password.html';
+    }
+
+    function showSecuritySettings() {
+      showError('Security settings coming soon!');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    // Weather and Spotify Integration
+    async function getWeatherAndPlaylist() {
+      try {
+        // Get user's location
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+
+        const { latitude, longitude } = position.coords;
+        
+        // Get weather data
+        const weatherRes = await fetch(`/api/weather?lat=${latitude}&lon=${longitude}`);
+        const weatherData = await weatherRes.json();
+
+        // Update weather UI
+        document.getElementById('weather-location').textContent = weatherData.location;
+        document.getElementById('weather-temp').textContent = `${weatherData.temperature}°C`;
+        document.getElementById('weather-desc').textContent = weatherData.description;
+        document.getElementById('weather-icon').textContent = getWeatherEmoji(weatherData.condition);
+
+        // Get user's top tracks
+        const topTracksRes = await fetch('/api/spotify/top-tracks');
+        const topTracks = await topTracksRes.json();
+        
+        // Display top tracks
+        const topTracksContainer = document.getElementById('top-tracks');
+        topTracksContainer.innerHTML = topTracks.map(track => `
+          <div class="flex items-center space-x-3 bg-gray-700 p-2 rounded">
+            <img src="${track.album.images[2].url}" alt="${track.name}" class="w-12 h-12 rounded">
+            <div>
+              <p class="text-white font-medium">${track.name}</p>
+              <p class="text-gray-400 text-sm">${track.artists.map(artist => artist.name).join(', ')}</p>
+            </div>
+          </div>
+        `).join('');
+
+        // Get Spotify playlist based on weather
+        const playlistRes = await fetch(`/api/spotify/playlist?mood=${getWeatherMood(weatherData.condition)}`);
+        const playlistData = await playlistRes.json();
+
+        // Update playlist info
+        document.getElementById('playlist-name').textContent = playlistData.name;
+        document.getElementById('playlist-desc').textContent = playlistData.description;
+        
+        // Update Spotify embed
+        const spotifyFrame = document.getElementById('spotify-frame');
+        spotifyFrame.src = playlistData.embedUrl;
+
+        // Display playlist tracks
+        const tracksContainer = document.getElementById('playlist-tracks');
+        tracksContainer.innerHTML = playlistData.tracks.map(track => `
+          <div class="flex items-center space-x-3 bg-white bg-opacity-10 p-2 rounded">
+            <img src="${track.image}" alt="${track.name}" class="w-10 h-10 rounded">
+            <div>
+              <p class="text-white text-sm font-medium">${track.name}</p>
+              <p class="text-gray-300 text-xs">${track.artist}</p>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error fetching weather and playlist:', error);
+        showError('Failed to load weather and music recommendations');
+      }
+    }
+
+    function getWeatherEmoji(condition) {
+      const emojis = {
+        'clear': '☀️',
+        'clouds': '☁️',
+        'rain': '🌧️',
+        'snow': '❄️',
+        'thunderstorm': '⛈️',
+        'drizzle': '🌦️',
+        'mist': '🌫️'
+      };
+      return emojis[condition.toLowerCase()] || '🌤️';
+    }
+
+    function getWeatherMood(condition) {
+      const moods = {
+        'clear': 'happy',
+        'clouds': 'chill',
+        'rain': 'melancholy',
+        'snow': 'cozy',
+        'thunderstorm': 'intense',
+        'drizzle': 'relaxed',
+        'mist': 'mysterious'
+      };
+      return moods[condition.toLowerCase()] || 'neutral';
+    }
+
+    // Pinterest Integration
+    async function loadPinterestImages() {
+      try {
+        const res = await fetch('/api/pinterest/random');
+        const data = await res.json();
+        
+        const gallery = document.getElementById('pinterest-gallery');
+        data.images.forEach(image => {
+          const item = document.createElement('div');
+          item.className = 'pinterest-item';
+          item.innerHTML = `
+            <img src="${image.url}" alt="${image.title}" loading="lazy">
+          `;
+          gallery.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Error loading Pinterest images:', error);
+        showError('Failed to load inspiration gallery');
+      }
+    }
+
+    function loadMorePinterestImages() {
+      loadPinterestImages();
+    }
+
+    // Initialize new features
+    async function initializeFeatures() {
+      await getWeatherAndPlaylist();
+      await loadPinterestImages();
+    }
+
+    // Edit profile form submission
+    document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const res = await fetch('/api/user/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            name: formData.get('name')
+          })
+        });
+        if (res.ok) {
+          hideEditProfile();
+          loadUserData();
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    });
+
+    // Refresh token every 45 minutes
+    setInterval(async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return;
+
+        const res = await fetch('/api/refresh-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ refreshToken })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('token', data.token);
+        }
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+      }
+    }, 45 * 60 * 1000);
+
+    // Initialize
+    verifyToken();
+  </script>
+</body>
+</html>

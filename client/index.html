@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Super SaaS Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /*
+    body {
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80');
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+    }
+    */
+    .modal-bg {
+      background: rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen">
+  <video autoplay muted loop playsinline id="bg-video" class="fixed inset-0 w-full h-full object-cover z-0">
+    <source src="assets/Keep It Gucci The Art of Silk.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <!-- Navbar -->
+  <nav id="navbar" class="flex items-center justify-between px-4 md:px-8 py-4 bg-white bg-opacity-80 shadow z-10 relative">
+    <div class="flex items-center space-x-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="Logo" class="h-8 w-8">
+      <span id="logo" class=" spon font-bold text-xl text-blue-700">stingify</span>
+    </div>
+    <!-- Desktop Buttons -->
+    <div class="hidden md:flex space-x-2 md:space-x-4">
+      <button id="open-signup" class="custombutton bg-blue-600 text-white px-4 py-2 font-semibold hover:bg-blue-700">Sign Up</button>
+      <button id="open-login" class="custombutton bg-gray-700 text-white px-4 py-2 font-semibold hover:bg-gray-800">Login</button>
+    </div>
+    <!-- Hamburger Icon (Mobile) -->
+    <button id="hamburger" class="md:hidden flex flex-col justify-center items-center w-10 h-10 focus:outline-none">
+      <span class="block w-6 h-0.5 bg-gray-800 mb-1"></span>
+      <span class="block w-6 h-0.5 bg-gray-800 mb-1"></span>
+      <span class="block w-6 h-0.5 bg-gray-800"></span>
+    </button>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed top-0 right-0 w-2/3 max-w-xs h-full bg-white shadow-lg z-50 transform translate-x-full transition-transform duration-200 md:hidden flex flex-col items-center pt-20 space-y-6">
+      <button id="close-mobile-menu" class="absolute top-4 right-4 text-3xl text-gray-500">&times;</button>
+      <button id="mobile-signup" class="custombutton bg-blue-600 text-white px-6 py-2 font-semibold hover:bg-blue-700 w-4/5">Sign Up</button>
+      <button id="mobile-login" class="custombutton bg-gray-700 text-white px-6 py-2 font-semibold hover:bg-gray-800 w-4/5">Login</button>
+    </div>
+    <!-- Overlay for mobile menu -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden md:hidden"></div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="tex" class="flex flex-col items-center justify-center text-center mt-32 z-10 relative">
+    <h1 id="gb" class="text-5xl font-bold text-green-500 drop-shadow-lg mb-7">Grow Your Business with stingify</h1>
+    <p id="gb" class="text-xl text-white mb-8 drop-shadow">The ultimate SaaS solution for modern teams.</p>
+    <button id="cta-signup" class="px-8 py-3 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 shadow-lg">Get Started</button>
+  </section>
+
+  <!-- Sign Up Modal -->
+  <div id="signup-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="modal-bg absolute inset-0"></div>
+    <div id="signupc" class="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-md z-10">
+      <button id="close-signup" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+      <form id="signup-form" class="space-y-4">
+        <input type="text" name="name" placeholder="Name" required class="w-full px-3 py-2 border rounded"/>
+        <input type="email" name="email" placeholder="Email" required class="w-full px-3 py-2 border rounded"/>
+        <input type="password" name="password" placeholder="Password" required class="w-full px-3 py-2 border rounded"/>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Sign Up</button>
+        <div id="signup-message" class="text-sm text-center"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="modal-bg absolute inset-0"></div>
+    <div id="loginc" class="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-md z-10">
+      <button id="close-login" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+      <form id="login-form" class="space-y-4">
+        <input type="email" name="email" placeholder="Email" required class="w-full px-3 py-2 border rounded"/>
+        <input type="password" name="password" placeholder="Password" required class="w-full px-3 py-2 border rounded"/>
+        <div class="text-right">
+          <a href="#" id="forgot-password-link" class="text-blue-600 hover:underline text-sm">Forgot password?</a>
+        </div>
+        <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800">Login</button>
+        <div id="login-message" class="text-sm text-center"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="modal-bg absolute inset-0"></div>
+    <div class="relative bg-white rounded-lg shadow-lg p-8 w-full max-w-md z-10">
+      <button id="close-forgot" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-4 text-center">Reset Password</h2>
+      <form id="forgot-form" class="space-y-4">
+        <input type="email" name="email" placeholder="Enter your email" required class="w-full px-3 py-2 border rounded"/>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Send Reset Link</button>
+        <div id="forgot-message" class="text-sm text-center"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal logic
+    const signupModal = document.getElementById('signup-modal');
+    const loginModal = document.getElementById('login-modal');
+    document.getElementById('open-signup').onclick = () => signupModal.classList.remove('hidden');
+    document.getElementById('cta-signup').onclick = () => signupModal.classList.remove('hidden');
+    document.getElementById('close-signup').onclick = () => signupModal.classList.add('hidden');
+    document.getElementById('open-login').onclick = () => loginModal.classList.remove('hidden');
+    document.getElementById('close-login').onclick = () => loginModal.classList.add('hidden');
+    // Close modals on background click
+    signupModal.querySelector('.modal-bg').onclick = () => signupModal.classList.add('hidden');
+    loginModal.querySelector('.modal-bg').onclick = () => loginModal.classList.add('hidden');
+
+    // Sign Up form
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        password: form.password.value
+      };
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const msg = await res.json();
+      document.getElementById('signup-message').textContent = msg.message;
+      if (res.ok) form.reset();
+    });
+
+    // Login form
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        email: form.email.value,
+        password: form.password.value
+      };
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const msg = await res.json();
+      document.getElementById('login-message').textContent = msg.message;
+      if (res.ok) {
+        // Store JWT in localStorage and redirect
+        localStorage.setItem('token', msg.token);
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Forgot Password modal logic
+    const forgotModal = document.getElementById('forgot-modal');
+    document.getElementById('forgot-password-link').onclick = () => {
+      loginModal.classList.add('hidden');
+      forgotModal.classList.remove('hidden');
+    };
+    document.getElementById('close-forgot').onclick = () => forgotModal.classList.add('hidden');
+    forgotModal.querySelector('.modal-bg').onclick = () => forgotModal.classList.add('hidden');
+
+    // Forgot Password form submit
+    document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const email = form.email.value;
+      const res = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const msg = await res.json();
+      document.getElementById('forgot-message').textContent = msg.message;
+      if (res.ok) form.reset();
+    });
+
+    // Hamburger menu logic
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const closeMobileMenu = document.getElementById('close-mobile-menu');
+    const mobileSignup = document.getElementById('mobile-signup');
+    const mobileLogin = document.getElementById('mobile-login');
+
+    hamburger.onclick = () => {
+      mobileMenu.classList.remove('translate-x-full');
+      mobileMenuOverlay.classList.remove('hidden');
+    };
+    closeMobileMenu.onclick = () => {
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.add('hidden');
+    };
+    mobileMenuOverlay.onclick = () => {
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.add('hidden');
+    };
+    // Open modals from mobile menu
+    mobileSignup.onclick = () => {
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.add('hidden');
+      signupModal.classList.remove('hidden');
+    };
+    mobileLogin.onclick = () => {
+      mobileMenu.classList.add('translate-x-full');
+      mobileMenuOverlay.classList.add('hidden');
+      loginModal.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>
